@@ -10,7 +10,8 @@
 // Tone rule: never "Error/Failed/Invalid/Rejected" — warm, neighbourly copy.
 // ============================================================
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 import Link from "next/link"
 import { VoiceInputButton } from "@/components/VoiceInputButton"
 import { NicknamePrompt } from "@/components/NicknamePrompt"
@@ -46,6 +47,19 @@ export default function ReportPage() {
   const [phase, setPhase] = useState<Phase>({ kind: "idle" })
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [description, setDescription] = useState("")
+  // Real device location (geo-location). Falls back to the demo coordinate if
+  // the citizen denies permission or the browser has no GPS.
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setCoords(null), // denied / unavailable → keep the fallback
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    )
+  }, [])
 
   async function handlePhoto(file: File) {
     setPreviewUrl(URL.createObjectURL(file))
@@ -53,8 +67,8 @@ export default function ReportPage() {
 
     const form = new FormData()
     form.append("photo", file)
-    form.append("lat", String(DEFAULT_LAT))
-    form.append("lng", String(DEFAULT_LNG))
+    form.append("lat", String(coords?.lat ?? DEFAULT_LAT))
+    form.append("lng", String(coords?.lng ?? DEFAULT_LNG))
     // Optional spoken/typed context — enriches the report; vision still leads.
     if (description.trim()) form.append("note", description.trim())
 
@@ -215,7 +229,12 @@ export default function ReportPage() {
 
       {/* CREATE — new issue summary */}
       {phase.kind === "create" && phase.data.issue && (
-        <div className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700"
+        >
           <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
             ✅ Your voice is on the map!
           </p>
@@ -247,7 +266,7 @@ export default function ReportPage() {
           >
             View issue →
           </Link>
-        </div>
+        </motion.div>
       )}
     </main>
   )

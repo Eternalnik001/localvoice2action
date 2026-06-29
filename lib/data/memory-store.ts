@@ -172,8 +172,19 @@ class MemoryStore implements DataStore {
     }
     confirmations.last_updated = now
 
+    // Auto-escalation: sustained "Still There" pressure (≥10) bumps a NORMAL
+    // issue to URGENT so the authority sees the community signal.
+    const escalate =
+      confirmations.still_there >= 10 &&
+      issue.status !== "RESOLVED" &&
+      issue.status !== "CLOSED" &&
+      issue.authority.priority_flag === "NORMAL"
+
     const updated: Issue = {
       ...issue,
+      authority: escalate
+        ? { ...issue.authority, priority_flag: "URGENT" }
+        : issue.authority,
       confirmations,
       updated_at: now,
     }

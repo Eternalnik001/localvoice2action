@@ -202,10 +202,18 @@ class FirestoreStore implements DataStore {
     }
     confirmations.last_updated = now
 
-    const updated = await this.updateIssue(issueId, {
-      confirmations,
-      upvotes: issue.upvotes,
-    })
+    // Auto-escalation: sustained "Still There" pressure (≥10) bumps NORMAL → URGENT.
+    const patch: Partial<Issue> = { confirmations, upvotes: issue.upvotes }
+    if (
+      confirmations.still_there >= 10 &&
+      issue.status !== "RESOLVED" &&
+      issue.status !== "CLOSED" &&
+      issue.authority.priority_flag === "NORMAL"
+    ) {
+      patch.authority = { ...issue.authority, priority_flag: "URGENT" }
+    }
+
+    const updated = await this.updateIssue(issueId, patch)
     return { accepted: true, issue: updated }
   }
 

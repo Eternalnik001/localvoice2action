@@ -27,6 +27,11 @@ function buildTimeline(issue: Issue): TimelineEvent[] {
     issue.status === "ACKNOWLEDGED" ||
     issue.status === "IN_PROGRESS" ||
     isResolved
+  // Live escalation countdown from the report date.
+  const dayMs = 24 * 60 * 60 * 1000
+  const daysToEscalate =
+    issue.authority.escalation_days -
+    Math.floor((Date.now() - created.getTime()) / dayMs)
 
   // Derived approximate timestamps (offset from created_at) for the demo —
   // real events would be stamped as they happen once persistence is added.
@@ -63,7 +68,9 @@ function buildTimeline(issue: Issue): TimelineEvent[] {
       label: "Authority notified",
       detail: acknowledged
         ? `${issue.authority.name} acknowledged the report`
-        : `Pending — escalates in ${issue.authority.escalation_days} days`,
+        : daysToEscalate > 0
+          ? `Pending — escalates in ${daysToEscalate} day${daysToEscalate === 1 ? "" : "s"}`
+          : "Escalation overdue — flagged urgent",
       date: acknowledged ? notifiedAt : null,
       done: acknowledged,
     },

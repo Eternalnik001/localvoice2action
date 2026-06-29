@@ -81,9 +81,17 @@ export default async function DashboardPage() {
             Public accountability for Bengaluru&apos;s civic issues
           </p>
         </div>
-        <Link href="/" className="text-sm font-semibold text-brand-primary underline">
-          ← Back to map
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/profile"
+            className="text-sm font-semibold text-brand-primary underline"
+          >
+            👤 Profile
+          </Link>
+          <Link href="/" className="text-sm font-semibold text-brand-primary underline">
+            ← Back to map
+          </Link>
+        </div>
       </header>
 
       {/* Tier 2: the viewer's own badges (if they saved a nickname) */}

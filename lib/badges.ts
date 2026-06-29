@@ -5,7 +5,7 @@
 // scanning that token's issues, so they can never drift from reality.
 // ============================================================
 
-import type { Issue } from "@/lib/types"
+import type { Issue, CommunityBadge, IssueType } from "@/lib/types"
 
 export type BadgeId =
   | "FIRST_REPORTER"
@@ -135,4 +135,99 @@ export function topBadgeForArea(area: string, all: Issue[]): Badge | null {
     if (earned.has(id)) return BADGES[id]
   }
   return null
+}
+
+// ============================================================
+// Axis 2 — Community tier (a single progressive rank) and Expertise badges
+// (per issue type, 5 levels). Both DERIVED from the token's reports.
+// ============================================================
+
+export interface CommunityTier {
+  id: CommunityBadge
+  label: string
+  emoji: string
+  minReports: number
+}
+
+/** Ordered low → high. A token holds the highest tier its report count clears. */
+export const COMMUNITY_TIERS: CommunityTier[] = [
+  { id: "NEIGHBOURHOOD_NEWCOMER", label: "Neighbourhood Newcomer", emoji: "🌱", minReports: 0 },
+  { id: "STREET_SENTINEL", label: "Street Sentinel", emoji: "👁️", minReports: 1 },
+  { id: "WARD_WATCHDOG", label: "Ward Watchdog", emoji: "🐕", minReports: 3 },
+  { id: "COMMUNITY_CHAMPION", label: "Community Champion", emoji: "🏆", minReports: 6 },
+  { id: "DISTRICT_GUARDIAN", label: "District Guardian", emoji: "🛡️", minReports: 10 },
+]
+
+export interface CommunityTierProgress {
+  current: CommunityTier
+  next: CommunityTier | null
+  reports: number
+  reportsToNext: number | null
+}
+
+export function communityTierForToken(
+  token: string,
+  all: Issue[]
+): CommunityTierProgress {
+  const reports = token
+    ? all.filter((i) => i.reporter_token === token).length
+    : 0
+  let current = COMMUNITY_TIERS[0]!
+  for (const t of COMMUNITY_TIERS) if (reports >= t.minReports) current = t
+  const idx = COMMUNITY_TIERS.findIndex((t) => t.id === current.id)
+  const next = COMMUNITY_TIERS[idx + 1] ?? null
+  return {
+    current,
+    next,
+    reports,
+    reportsToNext: next ? Math.max(0, next.minReports - reports) : null,
+  }
+}
+
+export interface ExpertiseConfig {
+  type: IssueType
+  label: string
+  emoji: string
+}
+
+/** One expertise track per (citizen-reportable) issue type. */
+export const EXPERTISE: ExpertiseConfig[] = [
+  { type: "POTHOLE", label: "Pothole Patrol", emoji: "🕳️" },
+  { type: "WATER_LEAKAGE", label: "Water Guardian", emoji: "💧" },
+  { type: "BROKEN_STREETLIGHT", label: "Light Keeper", emoji: "💡" },
+  { type: "GARBAGE_OVERFLOW", label: "Waste Warrior", emoji: "🗑️" },
+  { type: "DAMAGED_FOOTPATH", label: "Footpath Defender", emoji: "🚶" },
+]
+
+/** Report counts that unlock levels 1..5 (Google Local Guides–style). */
+export const EXPERTISE_LEVELS = [1, 3, 6, 10, 20]
+
+export interface ExpertiseProgress {
+  type: IssueType
+  label: string
+  emoji: string
+  count: number
+  level: number // 0..5
+  nextThreshold: number | null // reports needed for the next level (null = maxed)
+}
+
+export function expertiseForToken(
+  token: string,
+  all: Issue[]
+): ExpertiseProgress[] {
+  const mine = token ? all.filter((i) => i.reporter_token === token) : []
+  return EXPERTISE.map((e) => {
+    const count = mine.filter((i) => i.issue_type === e.type).length
+    let level = 0
+    for (const th of EXPERTISE_LEVELS) if (count >= th) level += 1
+    const nextThreshold = EXPERTISE_LEVELS[level] ?? null
+    return {
+      type: e.type,
+      label: e.label,
+      emoji: e.emoji,
+      count,
+      level,
+      nextThreshold,
+    }
+  })
 }

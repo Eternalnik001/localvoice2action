@@ -13,29 +13,31 @@ import { NextResponse } from "next/server"
 import { hashIp, clientIpFrom } from "@/lib/security/iphash"
 import { tokenForIp, nicknameForToken } from "@/lib/data/citizens"
 import { getStore } from "@/lib/data"
-import { deriveBadgesForToken } from "@/lib/badges"
+import {
+  deriveBadgesForToken,
+  communityTierForToken,
+  expertiseForToken,
+} from "@/lib/badges"
 
 export const runtime = "nodejs"
 
 export async function GET(request: Request) {
   try {
     const ipHash = hashIp(clientIpFrom(request.headers))
-    const token = tokenForIp(ipHash)
 
-    if (!token) {
-      // Server restarted or the caller's IP changed — link is gone.
-      return NextResponse.json(
-        { badges: [], reason: "session_expired" },
-        { status: 200 }
-      )
-    }
-
-    // Badges are derived from the issues this IP-hash reported.
+    // All three axes are DERIVED from the issues this IP-hash reported, so they
+    // work even before a nickname is saved (nickname is just a display label).
     const issues = await getStore().listIssues()
     const badges = deriveBadgesForToken(ipHash, issues)
-    const nickname = nicknameForToken(token)
+    const communityTier = communityTierForToken(ipHash, issues)
+    const expertise = expertiseForToken(ipHash, issues)
+    const token = tokenForIp(ipHash)
+    const nickname = token ? nicknameForToken(token) : null
 
-    return NextResponse.json({ badges, nickname }, { status: 200 })
+    return NextResponse.json(
+      { badges, nickname, communityTier, expertise },
+      { status: 200 }
+    )
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unexpected error."
     return NextResponse.json({ error: message }, { status: 500 })

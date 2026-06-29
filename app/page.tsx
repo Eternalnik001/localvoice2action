@@ -45,6 +45,12 @@ export default async function HomePage() {
               📊 Dashboard
             </Link>
             <Link
+              href="/profile"
+              className="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/25"
+            >
+              👤 Profile
+            </Link>
+            <Link
               href="/report"
               className="rounded-xl bg-brand-accent px-5 py-2.5 text-sm font-bold text-white shadow-md ring-1 ring-amber-700/30 transition hover:brightness-105"
             >

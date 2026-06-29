@@ -15,12 +15,23 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { VoiceInputButton } from "@/components/VoiceInputButton"
 import { NicknamePrompt } from "@/components/NicknamePrompt"
-import type { Issue } from "@/lib/types"
+import type { Issue, IssueType } from "@/lib/types"
 import type { ImpactEstimate } from "@/lib/agents/impactEstimator"
 
 // Default demo coords — Koramangala (near the seeded potholes → triggers merge).
 const DEFAULT_LAT = 12.9352
 const DEFAULT_LNG = 77.6245
+
+// Citizen-facing override choices (excludes NOT_A_CIVIC_ISSUE).
+const ISSUE_TYPE_OPTIONS: { value: IssueType; label: string }[] = [
+  { value: "POTHOLE", label: "Pothole" },
+  { value: "WATER_LEAKAGE", label: "Water leakage" },
+  { value: "BROKEN_STREETLIGHT", label: "Broken streetlight" },
+  { value: "GARBAGE_OVERFLOW", label: "Garbage overflow" },
+  { value: "DAMAGED_FOOTPATH", label: "Damaged footpath" },
+  { value: "ENCROACHMENT", label: "Encroachment" },
+  { value: "OTHER", label: "Other" },
+]
 
 interface AnalyzeResponse {
   action?: "merge" | "create"
@@ -119,6 +130,24 @@ export default function ReportPage() {
   // Voice transcript APPENDS to the textarea (space-separated), never replaces.
   function appendTranscript(text: string) {
     setDescription((prev) => (prev ? `${prev} ${text}` : text))
+  }
+
+  // Citizen overrides the AI's classification → re-route (Agent 3) + persist.
+  async function overrideType(newType: IssueType) {
+    if (phase.kind !== "create" || !phase.data.issue) return
+    const current = phase.data
+    try {
+      const res = await fetch("/api/update-issue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: current.issue!.id, issue_type: newType }),
+      })
+      if (!res.ok) return
+      const { issue } = (await res.json()) as { issue: Issue }
+      setPhase({ kind: "create", data: { ...current, issue } })
+    } catch {
+      // Keep the existing classification on failure — never block.
+    }
   }
 
   return (
@@ -250,6 +279,27 @@ export default function ReportPage() {
             Routed to {phase.data.issue.authority.name} ·{" "}
             {phase.data.issue.authority.department}
           </p>
+          {/* Override: citizen corrects the AI classification → re-routes */}
+          <div className="mt-3">
+            <label
+              htmlFor="issue-type-override"
+              className="text-xs font-medium text-slate-500 dark:text-slate-400"
+            >
+              Not quite right? Change the category
+            </label>
+            <select
+              id="issue-type-override"
+              value={phase.data.issue.issue_type}
+              onChange={(e) => overrideType(e.target.value as IssueType)}
+              className="mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white px-3 py-2 text-base text-slate-800 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary dark:bg-slate-900 dark:text-slate-100 sm:text-sm"
+            >
+              {ISSUE_TYPE_OPTIONS.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </div>
           {/* Gamification: badge earned this report (warm, inline) */}
           {phase.data.badges && phase.data.badges.length > 0 && (
             <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-sm font-medium text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800/60">

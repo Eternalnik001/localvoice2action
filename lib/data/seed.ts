@@ -17,18 +17,16 @@ const daysAgo = (n: number): Date => new Date(NOW.getTime() - n * DAY)
 
 // Generic civic photos (pothole/water/streetlight/garbage). Swappable later.
 const PHOTO = {
-  pothole:
-    "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=70",
-  potholeFixed:
-    "https://images.unsplash.com/photo-1545459720-aac8509eb02c?w=800&q=70",
+  // Real before/after photos, served statically from /public/issue-photos.
+  // (Other issue types still use stock imagery until real photos exist.)
+  pothole: "/issue-photos/Before_pothole.png",
+  potholeFixed: "/issue-photos/After_pothole.png",
   water:
     "https://images.unsplash.com/photo-1547683905-f686c993aae5?w=800&q=70",
   streetlight:
     "https://images.unsplash.com/photo-1542013936693-884638332954?w=800&q=70",
-  garbage:
-    "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&q=70",
-  garbageFixed:
-    "https://images.unsplash.com/photo-1558640476-437a2b9438a2?w=800&q=70",
+  garbage: "/issue-photos/Before_garbage.png",
+  garbageFixed: "/issue-photos/After_garbage.png",
   footpath:
     "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=800&q=70",
   // "sewage" is not a distinct IssueType in this codebase — sewage overflow is

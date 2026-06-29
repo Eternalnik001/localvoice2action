@@ -3,17 +3,13 @@
 // ============================================================
 // IssueMapOrList — the home view.
 //
-// Shows the INTERACTIVE Google Maps view immediately on the home page (no
-// "click to explore" gate). A "Pins / Heatmap" toggle flips between
-// status-colored markers and a community-amplified heat overlay.
-//
-// NOTE: google.maps.visualization.HeatmapLayer was REMOVED in Maps JS v3.65
-// (May 2026), so the heat view is rendered with core google.maps.Circle's —
-// weighted (lib/maps/heatmap) translucent circles that intensify where they
-// overlap. No deprecated API, no extra dependency.
-//
-// Falls back to a grouped LIST when there is no Maps key or the SDK fails to
-// load; a "Prefer a list?" toggle is always available.
+// Interactive Google Map (no "click to explore" gate) with a Pins/Heatmap
+// toggle. PINS use a state machine via AdvancedMarkerElement custom content:
+//   • Active        → severity-coloured dot (CRITICAL pulses)
+//   • Community Fixed→ grey dot + ✅ (fixed_now > still_there, not yet verified)
+//   • Authority Resolved → green dot + ✅ (RESOLVED); fades after 7 days
+// HEAT uses weighted google.maps.Circle's (HeatmapLayer was removed in Maps JS
+// v3.65). Falls back to a grouped LIST with no Maps key / SDK failure.
 // ============================================================
 
 import { useEffect, useRef, useState } from "react"
@@ -28,11 +24,66 @@ export interface IssueMapOrListProps {
   issues: Issue[]
 }
 
-// Marker color by STATUS (open = red, in_progress = amber, resolved = green).
-function statusHex(status: Issue["status"]): string {
-  if (status === "RESOLVED") return "#10B981"
-  if (status === "IN_PROGRESS") return "#F59E0B"
-  return "#DC2626" // OPEN / ACKNOWLEDGED / CLOSED → red (active)
+// Active-pin color by SEVERITY (critical red / high orange / medium amber / low lime).
+function severityHex(severity: Issue["severity"]): string {
+  if (severity === "CRITICAL") return "#DC2626"
+  if (severity === "HIGH") return "#EA580C"
+  if (severity === "MEDIUM") return "#D97706"
+  return "#65A30D" // LOW
+}
+
+type PinVisual = { color: string; check: boolean; pulse: boolean; faded: boolean }
+
+// Pin state machine: authority-resolved → community-fixed → active.
+function pinVisual(issue: Issue, nowMs: number): PinVisual {
+  const stillThere = issue.confirmations?.still_there ?? issue.upvotes
+  const fixedNow = issue.confirmations?.fixed_now ?? 0
+
+  if (issue.status === "RESOLVED") {
+    const ageDays = issue.resolved_at
+      ? (nowMs - issue.resolved_at.getTime()) / 86_400_000
+      : 0
+    return { color: "#10B981", check: true, pulse: false, faded: ageDays > 7 }
+  }
+  if (fixedNow > stillThere && fixedNow > 0) {
+    return { color: "#9CA3AF", check: true, pulse: false, faded: false } // community fixed (grey)
+  }
+  return {
+    color: severityHex(issue.severity),
+    check: false,
+    pulse: issue.severity === "CRITICAL",
+    faded: false,
+  }
+}
+
+// Build the DOM content for an AdvancedMarkerElement (Tailwind classes apply).
+function buildPin(v: PinVisual): HTMLDivElement {
+  const el = document.createElement("div")
+  el.className = "relative grid place-items-center"
+  el.style.opacity = v.faded ? "0.35" : "1"
+  el.style.cursor = "pointer"
+
+  if (v.pulse) {
+    const ring = document.createElement("span")
+    ring.className = "absolute inline-flex h-5 w-5 rounded-full animate-pulse-ring"
+    ring.style.backgroundColor = v.color
+    el.appendChild(ring)
+  }
+
+  const dot = document.createElement("span")
+  dot.className = "relative inline-block h-3.5 w-3.5 rounded-full"
+  dot.style.backgroundColor = v.color
+  dot.style.border = "2px solid #fff"
+  dot.style.boxShadow = "0 1px 3px rgba(0,0,0,.4)"
+  el.appendChild(dot)
+
+  if (v.check) {
+    const chk = document.createElement("span")
+    chk.textContent = "✅"
+    chk.className = "absolute -right-2 -top-2 text-[10px]"
+    el.appendChild(chk)
+  }
+  return el
 }
 
 const BENGALURU_CENTER = { lat: 12.9716, lng: 77.5946 }
@@ -42,29 +93,26 @@ type MapView = "pins" | "heat"
 
 export function IssueMapOrList({ issues }: IssueMapOrListProps) {
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-  // Interactive map straight away when we have a key; list when we don't.
   const [mode, setMode] = useState<Mode>(mapsKey ? "interactive" : "list")
   const [mapView, setMapView] = useState<MapView>("pins")
   const [mapFailed, setMapFailed] = useState(false)
 
   const mapRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
-  const markersRef = useRef<google.maps.Marker[]>([])
+  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([])
   const heatRef = useRef<google.maps.Circle[]>([])
-  // Latest view, readable inside the async build effect without making it a dep.
   const mapViewRef = useRef(mapView)
   mapViewRef.current = mapView
 
-  // Build the map + markers + heat circles once per (key/mode/issues). The view
+  // Build the map + pins + heat circles once per (key/mode/issues). The view
   // toggle below only flips layer visibility, so pan/zoom is preserved.
   useEffect(() => {
     if (!mapsKey || mode !== "interactive" || mapFailed) return
     let cancelled = false
     setOptions({ key: mapsKey, v: "weekly" })
     Promise.all([importLibrary("maps"), importLibrary("marker")])
-      .then(([{ Map }, { Marker }]) => {
+      .then(([{ Map, InfoWindow }, { AdvancedMarkerElement }]) => {
         if (cancelled || !mapRef.current) return
-        // Brand link color follows the theme (violet in dark, blue in light).
         const linkColor = document.documentElement.classList.contains("dark")
           ? "#8b5cf6"
           : "#1D4ED8"
@@ -73,39 +121,37 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
           zoom: 12,
           disableDefaultUI: true,
           zoomControl: true,
+          // AdvancedMarkerElement requires a mapId; DEMO_MAP_ID works out of the
+          // box, or set NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID to a real cloud map style.
+          mapId:
+            process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID",
         })
         mapInstanceRef.current = map
+        const nowMs = Date.now()
 
-        // --- Pins layer: status-colored, clickable markers ---
-        const markers: google.maps.Marker[] = []
-        for (const issue of issues) {
-          const marker = new Marker({
+        // --- Pins layer (state-machine markers) ---
+        const markers = issues.map((issue) => {
+          const marker = new AdvancedMarkerElement({
             position: { lat: issue.location.lat, lng: issue.location.lng },
             title: issue.title,
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 9,
-              fillColor: statusHex(issue.status),
-              fillOpacity: issue.status === "RESOLVED" ? 0.85 : 1,
-              strokeColor: "#fff",
-              strokeWeight: 2,
-            },
+            content: buildPin(pinVisual(issue, nowMs)),
           })
-          // Mini popup card: title, area, severity badge, View details link.
-          const info = new google.maps.InfoWindow({
+          const info = new InfoWindow({
             content: `<div style="font-family:Inter,sans-serif;max-width:220px">
               <strong>${issue.title}</strong><br/>
               <span style="color:#64748b;font-size:12px">${issue.location.area}</span><br/>
-              <span style="display:inline-block;margin:4px 0;padding:1px 8px;border-radius:9999px;font-size:11px;font-weight:600;background:${statusHex(issue.status)};color:#fff">${issue.severity}</span><br/>
+              <span style="display:inline-block;margin:4px 0;padding:1px 8px;border-radius:9999px;font-size:11px;font-weight:600;background:${severityHex(issue.severity)};color:#fff">${issue.severity}</span><br/>
               <a href="/issues/${issue.id}" style="color:${linkColor};font-size:13px">View details →</a>
             </div>`,
           })
-          marker.addListener("click", () => info.open(map, marker))
-          markers.push(marker)
-        }
+          marker.content!.addEventListener("click", () =>
+            info.open({ anchor: marker, map })
+          )
+          return marker
+        })
         markersRef.current = markers
 
-        // --- Heat layer: weighted translucent circles (overlap = hotter) ---
+        // --- Heat layer (weighted translucent circles, overlap = hotter) ---
         const weights = issues.map(
           (i) =>
             i.heatmap_weight ??
@@ -123,7 +169,7 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
             norm < 0.34 ? "#facc15" : norm < 0.67 ? "#fb923c" : "#ef4444"
           return new google.maps.Circle({
             center: { lat: issue.location.lat, lng: issue.location.lng },
-            radius: 220 + norm * 680, // metres — hotter spreads wider
+            radius: 220 + norm * 680,
             fillColor: color,
             fillOpacity: 0.3 + norm * 0.2,
             strokeOpacity: 0,
@@ -134,7 +180,7 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
 
         // Apply the current view (default: pins visible, heat hidden).
         const view = mapViewRef.current
-        markers.forEach((m) => m.setMap(view === "pins" ? map : null))
+        markers.forEach((m) => (m.map = view === "pins" ? map : null))
         circles.forEach((c) => c.setMap(view === "heat" ? map : null))
       })
       .catch(() => {
@@ -149,7 +195,7 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
   useEffect(() => {
     const map = mapInstanceRef.current
     if (!map) return
-    markersRef.current.forEach((m) => m.setMap(mapView === "pins" ? map : null))
+    markersRef.current.forEach((m) => (m.map = mapView === "pins" ? map : null))
     heatRef.current.forEach((c) => c.setMap(mapView === "heat" ? map : null))
   }, [mapView])
 
@@ -206,7 +252,7 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
     )
   }
 
-  // Interactive JS-SDK map — rendered immediately, with a Pins/Heatmap toggle.
+  // Interactive map — Pins/Heatmap toggle.
   const tab = (active: boolean) =>
     `rounded-full px-3 py-1.5 transition ${
       active

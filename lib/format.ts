@@ -2,6 +2,22 @@
 // Small formatting helpers (pure, dependency-free).
 // ============================================================
 
+import type { IssueStatus } from "@/lib/types"
+
+/** Title-case issue-status labels — single source of truth for display text. */
+export const STATUS_TEXT: Record<IssueStatus, string> = {
+  OPEN: "Open",
+  ACKNOWLEDGED: "Acknowledged",
+  IN_PROGRESS: "In progress",
+  RESOLVED: "Resolved",
+  CLOSED: "Closed",
+}
+
+/** Human-friendly status label, e.g. "In progress". */
+export function statusText(status: IssueStatus): string {
+  return STATUS_TEXT[status]
+}
+
 /** Human "time ago" string, e.g. "3 days ago", "just now". */
 export function timeAgo(date: Date, now: Date = new Date()): string {
   const sec = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000))

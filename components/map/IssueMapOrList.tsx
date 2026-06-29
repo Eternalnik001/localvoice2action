@@ -45,6 +45,10 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
     Promise.all([importLibrary("maps"), importLibrary("marker")])
       .then(([{ Map }, { Marker }]) => {
         if (cancelled || !mapRef.current) return
+        // Brand link color follows the theme (violet in dark, blue in light).
+        const linkColor = document.documentElement.classList.contains("dark")
+          ? "#8b5cf6"
+          : "#1D4ED8"
         const map = new Map(mapRef.current, {
           center: BENGALURU_CENTER,
           zoom: 12,
@@ -71,7 +75,7 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
               <strong>${issue.title}</strong><br/>
               <span style="color:#64748b;font-size:12px">${issue.location.area}</span><br/>
               <span style="display:inline-block;margin:4px 0;padding:1px 8px;border-radius:9999px;font-size:11px;font-weight:600;background:${statusHex(issue.status)};color:#fff">${issue.severity}</span><br/>
-              <a href="/issues/${issue.id}" style="color:#1D4ED8;font-size:13px">View details →</a>
+              <a href="/issues/${issue.id}" style="color:${linkColor};font-size:13px">View details →</a>
             </div>`,
           })
           marker.addListener("click", () => info.open(map, marker))

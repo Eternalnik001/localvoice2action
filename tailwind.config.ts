@@ -18,8 +18,10 @@ const config: Config = {
       colors: {
         // Brand
         brand: {
-          DEFAULT: "#1D4ED8", // blue-700 — primary
-          primary: "#1D4ED8",
+          // Driven by the --brand-primary CSS var (app/globals.css) so the brand
+          // color flips to purple in dark mode. Light mode stays blue (#1D4ED8).
+          DEFAULT: "var(--brand-primary)",
+          primary: "var(--brand-primary)",
           accent: "#F59E0B", // amber-500 — accent / CTA
         },
         // Resolution / success

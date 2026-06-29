@@ -27,13 +27,13 @@ export default async function HomePage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
       {/* Gradient hero */}
-      <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary to-blue-900 px-6 py-7 text-white shadow-lg">
+      <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary to-blue-900 dark:from-[#2e1065] dark:to-black px-6 py-7 text-white shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4 pr-12">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               LocalVoice2Action
             </h1>
-            <p className="mt-1 text-blue-100">
+            <p className="mt-1 text-blue-100 dark:text-violet-300">
               Every voice. Every street. Every fix.
             </p>
           </div>
@@ -54,18 +54,18 @@ export default async function HomePage() {
         </div>
 
         {/* Stat chips */}
-        <div className="mt-6 grid grid-cols-3 gap-3 sm:max-w-md">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:max-w-md sm:grid-cols-3">
           <div className="rounded-2xl bg-white/10 px-3 py-2.5 text-center ring-1 ring-white/15">
             <div className="text-2xl font-bold">{issues.length}</div>
-            <div className="text-xs text-blue-100">issues reported</div>
+            <div className="text-xs text-blue-100 dark:text-violet-300">issues reported</div>
           </div>
           <div className="rounded-2xl bg-white/10 px-3 py-2.5 text-center ring-1 ring-white/15">
             <div className="text-2xl font-bold">{resolvedCount}</div>
-            <div className="text-xs text-blue-100">resolved</div>
+            <div className="text-xs text-blue-100 dark:text-violet-300">resolved</div>
           </div>
-          <div className="rounded-2xl bg-white/10 px-3 py-2.5 text-center ring-1 ring-white/15">
+          <div className="col-span-2 rounded-2xl bg-white/10 px-3 py-2.5 text-center ring-1 ring-white/15 sm:col-span-1">
             <div className="text-2xl font-bold">{areaCount}</div>
-            <div className="text-xs text-blue-100">neighbourhoods</div>
+            <div className="text-xs text-blue-100 dark:text-violet-300">neighbourhoods</div>
           </div>
         </div>
       </header>

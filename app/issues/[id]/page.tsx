@@ -8,6 +8,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { getStore } from "@/lib/data"
+import { statusText } from "@/lib/format"
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider"
 import { NearbyCitizensCard } from "@/components/NearbyCitizensCard"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
@@ -61,7 +62,7 @@ function impactFor(issue: Issue): ImpactEstimate {
     commuters: residents * 2,
     businesses: Math.max(2, sev * 3),
     deliveryPartners: Math.max(3, sev * 5),
-    tagline: `You're not the only one — around ${residents + residents * 2} neighbours in ${issue.location.area} feel this too.`,
+    tagline: `You're not alone — an estimated ${residents + residents * 2} neighbours in ${issue.location.area} are affected.`,
   }
 }
 
@@ -109,7 +110,7 @@ export default async function IssueDetailPage({
                   : "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300"
             }`}
           >
-            {issue.status.replace("_", " ")}
+            {statusText(issue.status)}
           </span>
         </div>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">{issue.title}</h1>
@@ -122,7 +123,7 @@ export default async function IssueDetailPage({
         {/* Reporter line + earned badges */}
         <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
           <span className="text-sm text-slate-500 dark:text-slate-400">
-            Reported by {issue.reporter_display_name ?? "a citizen"}
+            Reported by {issue.reporter_display_name ?? "Anonymous Neighbour"}
           </span>
           <BadgePills badges={reporterBadges} />
         </div>

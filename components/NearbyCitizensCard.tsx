@@ -109,6 +109,9 @@ export function NearbyCitizensCard({
           </div>
         ))}
       </div>
+      <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+        Rough estimate from issue severity + community confirmations.
+      </p>
 
       {/* 4. Progress: fixedNow as % of total. Amber→green only when mostly fixed. */}
       <div className="mt-4">

@@ -37,6 +37,20 @@ gcloud billing projects describe "${PROJECT_ID}" --format='value(billingEnabled)
 echo "==> Enabling required APIs (run, cloudbuild, artifactregistry)"
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
 
+# Optional Firestore mode (no service-account key needed — uses ADC on Cloud Run):
+#   USE_FIRESTORE=1 SEED_TOKEN=some-long-secret bash scripts/deploy.sh
+USE_FIRESTORE="${USE_FIRESTORE:-0}"
+SEED_TOKEN="${SEED_TOKEN:-}"
+
+ENV_VARS="GEMINI_API_KEY=${GEMINI_KEY},GEMINI_MODEL=${GEMINI_MODEL_VAL}"
+if [ "${USE_FIRESTORE}" = "1" ]; then
+  ENV_VARS="${ENV_VARS},USE_FIRESTORE=1"
+  echo "==> Firestore mode ON (Application Default Credentials)"
+fi
+if [ -n "${SEED_TOKEN}" ]; then
+  ENV_VARS="${ENV_VARS},SEED_TOKEN=${SEED_TOKEN}"
+fi
+
 echo "==> Deploying ${SERVICE} to Cloud Run (${REGION}) from source"
 gcloud run deploy "${SERVICE}" \
   --source . \
@@ -48,7 +62,7 @@ gcloud run deploy "${SERVICE}" \
   --cpu 1 \
   --min-instances 0 \
   --max-instances 2 \
-  --set-env-vars "GEMINI_API_KEY=${GEMINI_KEY},GEMINI_MODEL=${GEMINI_MODEL_VAL}"
+  --set-env-vars "${ENV_VARS}"
 
 echo
 echo "==> Deployed. Public URL:"

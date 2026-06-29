@@ -10,11 +10,13 @@ import {
   getApps,
   getApp,
   cert,
+  applicationDefault,
   type App,
 } from "firebase-admin/app"
 import { getFirestore, type Firestore } from "firebase-admin/firestore"
 
-function hasAdminConfig(): boolean {
+// Explicit service-account creds (used for LOCAL dev with a downloaded key).
+function hasExplicitConfig(): boolean {
   return Boolean(
     process.env.FIREBASE_ADMIN_PROJECT_ID &&
       process.env.FIREBASE_ADMIN_CLIENT_EMAIL &&
@@ -22,16 +24,35 @@ function hasAdminConfig(): boolean {
   )
 }
 
+// Select the Firestore driver when EITHER explicit creds are present, OR we're
+// told to use ADC (USE_FIRESTORE=1). On Cloud Run, Application Default
+// Credentials come from the service-account identity — no key/secret needed.
+function firestoreEnabled(): boolean {
+  return hasExplicitConfig() || process.env.USE_FIRESTORE === "1"
+}
+
 function getAdminApp(): App | null {
-  if (!hasAdminConfig()) return null
+  if (!firestoreEnabled()) return null
   if (getApps().length > 0) return getApp()
+
+  if (hasExplicitConfig()) {
+    return initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+        // The key is stored as a single line with literal \n escapes; restore them.
+        privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      }),
+    })
+  }
+
+  // ADC path (Cloud Run / Cloud Shell / any gcloud-authed env). No secret.
   return initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      // The key is stored as a single line with literal \n escapes; restore them.
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    }),
+    credential: applicationDefault(),
+    projectId:
+      process.env.FIREBASE_ADMIN_PROJECT_ID ||
+      process.env.GOOGLE_CLOUD_PROJECT ||
+      process.env.GCLOUD_PROJECT,
   })
 }
 

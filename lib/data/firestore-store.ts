@@ -213,6 +213,15 @@ class FirestoreStore implements DataStore {
       patch.authority = { ...issue.authority, priority_flag: "URGENT" }
     }
 
+    // Auto-validation: a clear "Fixed Now" consensus marks community-verified.
+    if (
+      confirmations.fixed_now > confirmations.still_there &&
+      confirmations.fixed_now >= 3 &&
+      issue.status !== "RESOLVED"
+    ) {
+      patch.verification_status = "COMMUNITY_VERIFIED"
+    }
+
     const updated = await this.updateIssue(issueId, patch)
     return { accepted: true, issue: updated }
   }

@@ -180,11 +180,22 @@ class MemoryStore implements DataStore {
       issue.status !== "CLOSED" &&
       issue.authority.priority_flag === "NORMAL"
 
+    // Auto-validation: a clear "Fixed Now" consensus marks the issue
+    // community-verified (drives the grey ✅ pin). Photo-based Agent 4
+    // validation still runs on a corroborating-photo upload.
+    const communityVerified =
+      confirmations.fixed_now > confirmations.still_there &&
+      confirmations.fixed_now >= 3 &&
+      issue.status !== "RESOLVED"
+
     const updated: Issue = {
       ...issue,
       authority: escalate
         ? { ...issue.authority, priority_flag: "URGENT" }
         : issue.authority,
+      verification_status: communityVerified
+        ? "COMMUNITY_VERIFIED"
+        : issue.verification_status,
       confirmations,
       updated_at: now,
     }

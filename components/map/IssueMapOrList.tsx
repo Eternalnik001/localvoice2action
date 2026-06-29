@@ -45,7 +45,10 @@ function pinVisual(issue: Issue, nowMs: number): PinVisual {
       : 0
     return { color: "#10B981", check: true, pulse: false, faded: ageDays > 7 }
   }
-  if (fixedNow > stillThere && fixedNow > 0) {
+  if (
+    issue.verification_status === "COMMUNITY_VERIFIED" ||
+    (fixedNow > stillThere && fixedNow > 0)
+  ) {
     return { color: "#9CA3AF", check: true, pulse: false, faded: false } // community fixed (grey)
   }
   return {

@@ -1,15 +1,11 @@
 "use client"
 
 // ============================================================
-// IssueMapOrList — the home view, cost-optimised.
+// IssueMapOrList — the home view.
 //
-// THREE render tiers:
-//   1. STATIC MAP IMAGE on initial load (Static Maps API — cheap SKU, 28k/mo
-//      free). Most visitors only look, so this avoids the expensive dynamic
-//      JS-SDK "map load" SKU ~90% of the time.
-//   2. INTERACTIVE JS SDK MAP only after the user clicks "explore" — the costly
-//      SKU fires solely on intent.
-//   3. LIST fallback when there is NO Maps key at all (truly ₹0-capable).
+// Shows the INTERACTIVE Google Maps view immediately on the home page (no
+// "click to explore" gate). Falls back to a grouped LIST when there is no Maps
+// key or the SDK fails to load; a "Prefer a list?" toggle is always available.
 // ============================================================
 
 import { useEffect, useRef, useState } from "react"
@@ -30,73 +26,18 @@ function statusHex(status: Issue["status"]): string {
   return "#DC2626" // OPEN / ACKNOWLEDGED / CLOSED → red (active)
 }
 
-// Static Maps marker color (named/hex) — same status mapping.
-function statusStatic(status: Issue["status"]): string {
-  if (status === "RESOLVED") return "green"
-  if (status === "IN_PROGRESS") return "orange"
-  return "red"
-}
-
 const BENGALURU_CENTER = { lat: 12.9716, lng: 77.5946 }
 
-/** Build a Static Maps API URL with one marker per issue (cheap SKU). */
-function buildStaticMapUrl(issues: Issue[], key: string): string {
-  const params = new URLSearchParams({
-    center: `${BENGALURU_CENTER.lat},${BENGALURU_CENTER.lng}`,
-    zoom: "11",
-    size: "640x360",
-    scale: "2",
-    key,
-  })
-  // Cap markers in the URL to keep it under length limits; group by status.
-  const byStatus = new Map<string, string[]>()
-  for (const i of issues.slice(0, 60)) {
-    const color = statusStatic(i.status)
-    const arr = byStatus.get(color) ?? []
-    arr.push(`${i.location.lat.toFixed(4)},${i.location.lng.toFixed(4)}`)
-    byStatus.set(color, arr)
-  }
-  let qs = params.toString()
-  for (const [color, points] of byStatus) {
-    qs += `&markers=${encodeURIComponent(`color:${color}|size:small|${points.join("|")}`)}`
-  }
-  return `https://maps.googleapis.com/maps/api/staticmap?${qs}`
-}
-
-type Mode = "static" | "interactive" | "list"
-
-// Below this viewport width the map is too cramped to be useful — default to
-// the list (matches Tailwind's `sm` breakpoint). Users can still tap into the
-// map via "Show map" if they want it.
-const MOBILE_BREAKPOINT = 640
+type Mode = "interactive" | "list"
 
 export function IssueMapOrList({ issues }: IssueMapOrListProps) {
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-  // Static image first when we have a key; list when we don't.
-  // (Server renders the static-first default; the effect below downgrades to
-  // list on mobile after mount — avoids a hydration mismatch from reading
-  // window during render.)
-  const [mode, setMode] = useState<Mode>(mapsKey ? "static" : "list")
-  const [isMobile, setIsMobile] = useState(false)
+  // Interactive map straight away when we have a key; list when we don't.
+  const [mode, setMode] = useState<Mode>(mapsKey ? "interactive" : "list")
   const [mapFailed, setMapFailed] = useState(false)
   const mapRef = useRef<HTMLDivElement | null>(null)
 
-  // On mobile, the map needs too much space — show the list by default.
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const apply = () => {
-      setIsMobile(mq.matches)
-      // Only auto-switch to list when entering mobile from the default static
-      // view; never override an explicit "interactive" choice.
-      if (mq.matches) setMode((m) => (m === "static" ? "list" : m))
-    }
-    apply()
-    mq.addEventListener("change", apply)
-    return () => mq.removeEventListener("change", apply)
-  }, [])
-
-  // Only spin up the expensive JS SDK once the user opts into interactivity.
+  // Spin up the Google Maps JS SDK as soon as the interactive view mounts.
   useEffect(() => {
     if (!mapsKey || mode !== "interactive" || mapFailed) return
     let cancelled = false
@@ -146,16 +87,16 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
 
   const groups = groupIssuesByArea(issues)
 
-  // No key (or the interactive map failed) → reliable list.
+  // No key, explicit list choice, or the interactive map failed → reliable list.
   if (!mapsKey || mode === "list" || mapFailed) {
     return (
       <div>
         {mapsKey && !mapFailed && (
           <button
-            onClick={() => setMode(isMobile ? "interactive" : "static")}
+            onClick={() => setMode("interactive")}
             className="mb-3 text-sm font-semibold text-brand-primary underline"
           >
-            {isMobile ? "🗺️ Show map" : "← Back to map"}
+            🗺️ Show map
           </button>
         )}
         <div className="space-y-6">
@@ -197,44 +138,14 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
     )
   }
 
-  // Interactive JS-SDK map (only after the user clicked "explore").
-  if (mode === "interactive") {
-    return (
-      <div>
-        <button
-          onClick={() => setMode("static")}
-          className="mb-3 text-sm font-semibold text-brand-primary underline"
-        >
-          ← Done exploring
-        </button>
-        <div
-          ref={mapRef}
-          className="h-[60vh] w-full overflow-hidden rounded-2xl bg-slate-100"
-          aria-label="Interactive map of civic issues across Bengaluru"
-        />
-      </div>
-    )
-  }
-
-  // Default: STATIC map image (cheap SKU). Click to explore → JS SDK.
-  const staticUrl = buildStaticMapUrl(issues, mapsKey)
+  // Interactive JS-SDK map — rendered immediately, no gate.
   return (
     <div>
-      <div className="relative overflow-hidden rounded-2xl bg-slate-100">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={staticUrl}
-          alt="Map of civic issues across Bengaluru"
-          className="h-[60vh] w-full object-cover"
-          loading="lazy"
-        />
-        <button
-          onClick={() => setMode("interactive")}
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-brand-primary shadow-lg backdrop-blur-sm transition hover:bg-white"
-        >
-          🔍 Click to explore the map
-        </button>
-      </div>
+      <div
+        ref={mapRef}
+        className="h-[60vh] w-full overflow-hidden rounded-2xl bg-slate-100"
+        aria-label="Interactive map of civic issues across Bengaluru"
+      />
       <button
         onClick={() => setMode("list")}
         className="mt-2 text-sm text-slate-500 underline"

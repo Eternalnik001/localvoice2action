@@ -1,6 +1,6 @@
 // ============================================================
 // Home page — server component. "The map is the product."
-// Static-map-first hero (zero-cost; JS SDK only on click) + a recent-issues
+// Interactive map hero (Google Maps JS SDK loads on mount) + a recent-issues
 // strip. Reads from the in-memory DAL. Zero Gemini; works with no Maps key
 // (falls back to a grouped list).
 // ============================================================
@@ -70,7 +70,7 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* Map hero (static-first, click to explore; list fallback) */}
+      {/* Map hero (interactive on load; list fallback) */}
       <div className="mt-6">
         <ErrorBoundary>
           <IssueMapOrList issues={issues} />

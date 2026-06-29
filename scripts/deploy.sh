@@ -13,7 +13,7 @@ set -euo pipefail
 
 # ---- Config (edit if needed) ----
 ACCOUNT="nikhilta24@gmail.com"     # PERSONAL account (never the work onequince one)
-PROJECT_ID="localvoice2action"     # the hackathon GCP project (#920687318983)
+PROJECT_ID="localvoice2action-ac21c"   # the hackathon GCP project (#429331672736)
 REGION="asia-south1"               # Mumbai — closest to Bengaluru
 SERVICE="localvoice2action"
 

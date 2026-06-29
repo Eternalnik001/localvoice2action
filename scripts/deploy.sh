@@ -12,9 +12,13 @@
 set -euo pipefail
 
 # ---- Config (edit if needed) ----
-PROJECT_ID="localvoice2action"     # the hackathon GCP project
+ACCOUNT="nikhilta24@gmail.com"     # PERSONAL account (never the work onequince one)
+PROJECT_ID="localvoice2action"     # the hackathon GCP project (#920687318983)
 REGION="asia-south1"               # Mumbai — closest to Bengaluru
 SERVICE="localvoice2action"
+
+echo "==> Using personal account ${ACCOUNT}"
+gcloud config set account "${ACCOUNT}"
 
 # ---- Read the server-only Gemini key from .env.local (never printed) ----
 GEMINI_KEY="$(grep -E '^GEMINI_API_KEY=' .env.local | cut -d= -f2-)"

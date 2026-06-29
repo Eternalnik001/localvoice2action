@@ -4,14 +4,23 @@
 // IssueMapOrList — the home view.
 //
 // Shows the INTERACTIVE Google Maps view immediately on the home page (no
-// "click to explore" gate). Falls back to a grouped LIST when there is no Maps
-// key or the SDK fails to load; a "Prefer a list?" toggle is always available.
+// "click to explore" gate). A "Pins / Heatmap" toggle flips between
+// status-colored markers and a community-amplified heat overlay.
+//
+// NOTE: google.maps.visualization.HeatmapLayer was REMOVED in Maps JS v3.65
+// (May 2026), so the heat view is rendered with core google.maps.Circle's —
+// weighted (lib/maps/heatmap) translucent circles that intensify where they
+// overlap. No deprecated API, no extra dependency.
+//
+// Falls back to a grouped LIST when there is no Maps key or the SDK fails to
+// load; a "Prefer a list?" toggle is always available.
 // ============================================================
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 import { groupIssuesByArea } from "@/lib/data/areaGrouping"
+import { computeHeatmapWeight } from "@/lib/maps/heatmap"
 import { SeverityBadge } from "@/components/SeverityBadge"
 import type { Issue } from "@/lib/types"
 
@@ -29,15 +38,25 @@ function statusHex(status: Issue["status"]): string {
 const BENGALURU_CENTER = { lat: 12.9716, lng: 77.5946 }
 
 type Mode = "interactive" | "list"
+type MapView = "pins" | "heat"
 
 export function IssueMapOrList({ issues }: IssueMapOrListProps) {
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
   // Interactive map straight away when we have a key; list when we don't.
   const [mode, setMode] = useState<Mode>(mapsKey ? "interactive" : "list")
+  const [mapView, setMapView] = useState<MapView>("pins")
   const [mapFailed, setMapFailed] = useState(false)
-  const mapRef = useRef<HTMLDivElement | null>(null)
 
-  // Spin up the Google Maps JS SDK as soon as the interactive view mounts.
+  const mapRef = useRef<HTMLDivElement | null>(null)
+  const mapInstanceRef = useRef<google.maps.Map | null>(null)
+  const markersRef = useRef<google.maps.Marker[]>([])
+  const heatRef = useRef<google.maps.Circle[]>([])
+  // Latest view, readable inside the async build effect without making it a dep.
+  const mapViewRef = useRef(mapView)
+  mapViewRef.current = mapView
+
+  // Build the map + markers + heat circles once per (key/mode/issues). The view
+  // toggle below only flips layer visibility, so pan/zoom is preserved.
   useEffect(() => {
     if (!mapsKey || mode !== "interactive" || mapFailed) return
     let cancelled = false
@@ -55,10 +74,13 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
           disableDefaultUI: true,
           zoomControl: true,
         })
+        mapInstanceRef.current = map
+
+        // --- Pins layer: status-colored, clickable markers ---
+        const markers: google.maps.Marker[] = []
         for (const issue of issues) {
           const marker = new Marker({
             position: { lat: issue.location.lat, lng: issue.location.lng },
-            map,
             title: issue.title,
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
@@ -79,7 +101,41 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
             </div>`,
           })
           marker.addListener("click", () => info.open(map, marker))
+          markers.push(marker)
         }
+        markersRef.current = markers
+
+        // --- Heat layer: weighted translucent circles (overlap = hotter) ---
+        const weights = issues.map(
+          (i) =>
+            i.heatmap_weight ??
+            computeHeatmapWeight({
+              severity: i.severity,
+              still_there: i.confirmations?.still_there ?? i.upvotes,
+              fixed_now: i.confirmations?.fixed_now ?? 0,
+              created_at: new Date(i.created_at),
+            })
+        )
+        const maxW = Math.max(1, ...weights)
+        const circles = issues.map((issue, idx) => {
+          const norm = weights[idx]! / maxW
+          const color =
+            norm < 0.34 ? "#facc15" : norm < 0.67 ? "#fb923c" : "#ef4444"
+          return new google.maps.Circle({
+            center: { lat: issue.location.lat, lng: issue.location.lng },
+            radius: 220 + norm * 680, // metres — hotter spreads wider
+            fillColor: color,
+            fillOpacity: 0.3 + norm * 0.2,
+            strokeOpacity: 0,
+            clickable: false,
+          })
+        })
+        heatRef.current = circles
+
+        // Apply the current view (default: pins visible, heat hidden).
+        const view = mapViewRef.current
+        markers.forEach((m) => m.setMap(view === "pins" ? map : null))
+        circles.forEach((c) => c.setMap(view === "heat" ? map : null))
       })
       .catch(() => {
         if (!cancelled) setMapFailed(true)
@@ -88,6 +144,14 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
       cancelled = true
     }
   }, [mapsKey, mode, mapFailed, issues])
+
+  // Toggle layer visibility when the view changes (no map rebuild).
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map) return
+    markersRef.current.forEach((m) => m.setMap(mapView === "pins" ? map : null))
+    heatRef.current.forEach((c) => c.setMap(mapView === "heat" ? map : null))
+  }, [mapView])
 
   const groups = groupIssuesByArea(issues)
 
@@ -142,9 +206,41 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
     )
   }
 
-  // Interactive JS-SDK map — rendered immediately, no gate.
+  // Interactive JS-SDK map — rendered immediately, with a Pins/Heatmap toggle.
+  const tab = (active: boolean) =>
+    `rounded-full px-3 py-1.5 transition ${
+      active
+        ? "bg-brand-primary text-white"
+        : "text-slate-600 dark:text-slate-300"
+    }`
+
   return (
     <div>
+      <div className="mb-2 flex justify-end">
+        <div
+          role="group"
+          aria-label="Map view"
+          className="inline-flex rounded-full bg-white p-0.5 text-xs font-semibold ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
+        >
+          <button
+            type="button"
+            onClick={() => setMapView("pins")}
+            aria-pressed={mapView === "pins"}
+            className={tab(mapView === "pins")}
+          >
+            📍 Pins
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapView("heat")}
+            aria-pressed={mapView === "heat"}
+            className={tab(mapView === "heat")}
+          >
+            🔥 Heatmap
+          </button>
+        </div>
+      </div>
+
       <div
         ref={mapRef}
         className="h-[60vh] w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800"

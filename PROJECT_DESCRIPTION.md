@@ -55,7 +55,7 @@ The platform is intentionally **frictionless and anonymous**: no login is requir
 
 - **Public accountability dashboard.** Live charts show resolution rates by area and by category, plus AI-generated predictive insights about the city's civic health — making authority performance transparent to everyone.
 
-- **Interactive live map.** A full Google Map renders every issue as a state-aware pin — severity-coloured when active (CRITICAL pins pulse), grey ✅ when the community reports it fixed, green ✅ when authority-resolved (fading after a week) — with a one-tap Pins ↔ Heatmap toggle.
+- **Interactive live map.** A full Google Map renders every issue as a clear, status-coloured pin (red = active, amber = in progress, green = resolved) — tap any pin for its type, area, and severity. The map tiles switch to a dark theme in dark mode, and a one-tap toggle flips to a community-weighted heatmap.
 
 - **Resilient by design.** Every AI call is bounded by a timeout with a graceful fallback, each major section is isolated by an error boundary, and routes show loading skeletons — so one slow or failing dependency never takes the experience down.
 

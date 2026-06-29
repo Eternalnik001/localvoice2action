@@ -16,6 +16,7 @@
 
 **🔗 Live app → https://localvoice2action-mkeeof7vsq-el.a.run.app**
 
+
 </div>
 
 ---
@@ -204,6 +205,7 @@ localvoice2action/
 
 Built with Next.js, Google Gemini, and Google Cloud.
 
-**[Open the live app →](https://localvoice2action-mkeeof7vsq-el.a.run.app)**
+**🔗 Google Doc for more info  → https://docs.google.com/document/d/1NEO3K3JfI5ulrTJ5UUhgdD0vg3jXRW2cVVYS-OpgY1s/edit?usp=sharing**
+
 
 </div>

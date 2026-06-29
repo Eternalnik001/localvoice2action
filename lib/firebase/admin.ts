@@ -56,13 +56,28 @@ function getAdminApp(): App | null {
   })
 }
 
+// Memoized so settings() — which may be called only ONCE, before any other use
+// of the Firestore instance — runs exactly once on first acquisition.
+let firestoreInstance: Firestore | null = null
+
 /**
  * Returns the Admin Firestore instance, or null when admin config is absent.
  * The data layer (lib/data) uses this to decide whether to select the
  * Firestore driver or the in-memory driver.
  */
 export function getAdminDb(): Firestore | null {
+  if (firestoreInstance) return firestoreInstance
+
   const app = getAdminApp()
   if (!app) return null
-  return getFirestore(app)
+
+  const db = getFirestore(app)
+  // Issue objects carry optional fields (reporter_token, resolution_witness_token,
+  // resolution_reasoning, …) that are frequently `undefined`. Firestore rejects
+  // `undefined` by default, which made seeding AND new-issue writes throw 500.
+  // Dropping undefined fields (instead of throwing) is the documented remedy.
+  db.settings({ ignoreUndefinedProperties: true })
+
+  firestoreInstance = db
+  return firestoreInstance
 }

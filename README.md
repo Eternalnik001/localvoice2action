@@ -115,7 +115,7 @@ A seventh agent generates the dashboard's **predictive city insights**, cached h
 |-------|------------|
 | **Framework** | Next.js 14 (App Router) · TypeScript (strict) |
 | **AI** | Google Gemini (`gemini-3.5-flash`) via the `@google/genai` SDK |
-| **Maps** | Google Maps — cost-optimized static-first rendering, interactive on demand |
+| **Maps** | Google Maps — interactive map (AdvancedMarkerElement pins) + weighted heatmap toggle + Geocoding API |
 | **Data** | Pluggable layer: in-memory (default) ↔ Cloud Firestore (drop-in) |
 | **UI** | Tailwind CSS · Recharts · framer-motion · lucide-react |
 | **Voice** | Web Speech API (browser-native) |

@@ -55,7 +55,7 @@ The platform is intentionally **frictionless and anonymous**: no login is requir
 
 - **Public accountability dashboard.** Live charts show resolution rates by area and by category, plus AI-generated predictive insights about the city's civic health — making authority performance transparent to everyone.
 
-- **Interactive live map.** A cost-optimised map renders the city's issues as colour-coded pins by status, becoming fully interactive on demand.
+- **Interactive live map.** A full Google Map renders every issue as a state-aware pin — severity-coloured when active (CRITICAL pins pulse), grey ✅ when the community reports it fixed, green ✅ when authority-resolved (fading after a week) — with a one-tap Pins ↔ Heatmap toggle.
 
 - **Resilient by design.** Every AI call is bounded by a timeout with a graceful fallback, each major section is isolated by an error boundary, and routes show loading skeletons — so one slow or failing dependency never takes the experience down.
 
@@ -86,7 +86,7 @@ Google's platform powers the intelligence, the geography, the data, and the host
 
 - **Google AI Studio** — used to design, test, and refine every agent prompt against `gemini-3.5-flash`, to select the model, and to provision the API key that the deployed application uses.
 
-- **Google Maps Platform** — Maps JavaScript API for the interactive issue map, Static Maps API for a fast, cost-efficient first paint, and Geocoding to resolve citizen locations to real Bengaluru neighbourhoods.
+- **Google Maps Platform** — the Maps JavaScript API (interactive map with AdvancedMarkerElement pins + a weighted heatmap view) and the Geocoding API to resolve citizen GPS to real Bengaluru neighbourhoods.
 
 - **Cloud Firestore** — durable, real-time persistence for issues, community confirmations, and resolution records, so reports and fixes persist and are shared across the platform.
 

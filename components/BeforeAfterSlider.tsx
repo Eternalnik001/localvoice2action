@@ -65,7 +65,7 @@ export function BeforeAfterSlider({
   }
 
   return (
-    <div className="w-full">
+    <div className="mx-auto w-full max-w-md">
       {verdict && (
         <div className="mb-2">
           <span
@@ -77,7 +77,7 @@ export function BeforeAfterSlider({
       )}
 
       <div
-        className="relative aspect-[4/3] w-full select-none overflow-hidden rounded-2xl bg-slate-100"
+        className="relative aspect-[3/4] w-full select-none overflow-hidden rounded-2xl bg-slate-100"
         style={{ touchAction: "none" }}
         onTouchMove={(e) => {
           const touch = e.touches[0]
@@ -93,10 +93,11 @@ export function BeforeAfterSlider({
           draggable={false}
         />
 
-        {/* Top layer: AFTER, clipped to the revealed width. */}
+        {/* Top layer: AFTER, revealed on the RIGHT (so it sits under the
+            AFTER pill); BEFORE base shows on the left under the BEFORE pill. */}
         <div
           className="absolute inset-0 overflow-hidden"
-          style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+          style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

@@ -23,7 +23,12 @@ export function ThemeToggle() {
       type="button"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="fixed right-4 top-4 z-50 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-slate-700 shadow-lg ring-1 ring-slate-200 backdrop-blur transition hover:bg-white dark:bg-slate-800/90 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-800"
+      // Offset by the safe-area inset so it clears the iOS status bar / notch.
+      style={{
+        top: "calc(env(safe-area-inset-top) + 0.75rem)",
+        right: "calc(env(safe-area-inset-right) + 0.75rem)",
+      }}
+      className="fixed z-50 grid h-11 w-11 place-items-center rounded-full bg-white/90 text-slate-700 shadow-lg ring-1 ring-slate-200 backdrop-blur transition hover:bg-white dark:bg-slate-800/90 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-800"
     >
       {mounted && isDark ? (
         <Sun className="h-5 w-5" />

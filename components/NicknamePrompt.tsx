@@ -72,7 +72,7 @@ export function NicknamePrompt() {
           onChange={(e) => setNickname(e.target.value)}
           placeholder="e.g. Asha from Koramangala"
           maxLength={40}
-          className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+          className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-1.5 text-base sm:text-sm focus:border-brand-primary focus:outline-none"
         />
         <button
           type="button"

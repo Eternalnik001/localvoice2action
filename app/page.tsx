@@ -28,7 +28,7 @@ export default async function HomePage() {
     <main className="mx-auto max-w-5xl px-4 py-6">
       {/* Gradient hero */}
       <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary to-blue-900 px-6 py-7 text-white shadow-lg">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4 pr-12">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               LocalVoice2Action

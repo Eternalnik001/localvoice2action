@@ -8,18 +8,41 @@
   --brand-primary: #1d4ed8;
   --brand-accent: #f59e0b;
   --resolved: #10b981;
+  /* Tints native controls (form fields, scrollbars) to the active theme. */
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
 }
 
 html,
 body {
   padding: 0;
   margin: 0;
+  /* Stop iOS from auto-inflating text on orientation change. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Match <html> bg to the body so the notch / overscroll-bounce area never
+   flashes white (iOS) or black behind the content. */
+html {
+  background: #f1f5f9;
+}
+.dark html {
+  background: #020617;
 }
 
 body {
   /* Soft slate base so white cards lift off the page. */
   background: #f1f5f9;
   color: #0f172a;
+  /* Respect iOS/Android safe areas (notch, Dynamic Island, home indicator).
+     env() resolves to 0 where there are no insets, so this is a no-op on
+     desktop and non-notch devices. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* Dark theme — next-themes toggles `.dark` on <html>. Slate-950 base so
@@ -27,6 +50,11 @@ body {
 .dark body {
   background: #020617;
   color: #e2e8f0;
+}
+
+/* Kill the grey tap-flash on touch; components supply their own hover/active. */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Hide scrollbars on the horizontal recent-issues strip while keeping scroll. */

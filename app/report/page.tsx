@@ -141,7 +141,7 @@ export default function ReportPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Describe the issue, or tap Speak to say it aloud…"
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 px-3 py-2 text-base sm:text-sm text-slate-800 dark:text-slate-100 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
             />
           </div>
 

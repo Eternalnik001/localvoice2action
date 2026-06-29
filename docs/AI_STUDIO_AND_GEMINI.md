@@ -220,5 +220,4 @@ That makes AI Studio unambiguously the "core tool" under the defensible function
 
 ---
 
-**Relevant code path:** `/Users/nikhil/LocalVoice2Action/lib/agents/` (target for the "Get code" exports).
-**Related doc:** `/Users/nikhil/LocalVoice2Action/docs/superpowers/specs/2026-06-22-localvoice2action-decisions.md` (records the stack corrections — why Gemini 1.5 and the old `@google/generative-ai` SDK were dropped).
+**Relevant code path:** `lib/agents/` (target for the "Get code" exports).

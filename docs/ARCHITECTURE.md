@@ -397,6 +397,6 @@ These three are deliberately decoupled by the DAL and the pure-agent rule: you c
 
 ---
 
-## 9. Related docs
+## 9. Notes
 
-- Stack-correction decisions (why Gemini 1.5 / the EOL SDK were dropped): `docs/superpowers/specs/2026-06-22-localvoice2action-decisions.md`
+- Built on a current, supported Google AI stack: the `@google/genai` SDK with `gemini-3.5-flash`.

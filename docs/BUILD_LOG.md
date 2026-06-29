@@ -39,8 +39,8 @@ x
 - **Gemini 1.5 is shut down and 404s** — any agent pinned to it would fail at runtime, which is fatal for a live demo and for the "Google Tech" / "Completeness" scoring.
 - A Gemini key embedded in client code (`NEXT_PUBLIC_*`) would leak the secret to every browser. Keeping it server-only means all model calls happen in route handlers / server code, satisfying the "no hardcoded / no client-exposed secrets" rule.
 
-**Files touched**
-- `docs/superpowers/specs/2026-06-22-localvoice2action-decisions.md` — records the corrections and the rationale above (authoritative decisions doc).
+**Rationale**
+- The corrections and reasoning above are the authoritative record for the stack choices.
 
 ---
 

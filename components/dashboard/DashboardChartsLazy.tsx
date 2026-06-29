@@ -16,8 +16,8 @@ const DashboardCharts = dynamic(
     ssr: false,
     loading: () => (
       <div className="mt-6 space-y-6">
-        <div className="h-64 animate-pulse rounded-2xl bg-slate-100" />
-        <div className="h-72 animate-pulse rounded-2xl bg-slate-100" />
+        <div className="h-64 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
+        <div className="h-72 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
       </div>
     ),
   }

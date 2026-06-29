@@ -89,9 +89,9 @@ export function NearbyCitizensCard({
   }
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <section className="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
       {/* 1. Warm tagline (18px, not a heading tag). */}
-      <p className="text-[18px] font-semibold leading-snug text-slate-900">
+      <p className="text-[18px] font-semibold leading-snug text-slate-900 dark:text-slate-100">
         {impact.tagline}
       </p>
 
@@ -100,19 +100,19 @@ export function NearbyCitizensCard({
         {breakdown.map((b) => (
           <div
             key={b.label}
-            className="rounded-xl bg-slate-50 px-3 py-3 text-center ring-1 ring-slate-100"
+            className="rounded-xl bg-slate-50 dark:bg-slate-900 px-3 py-3 text-center ring-1 ring-slate-100 dark:ring-slate-800"
           >
             <div className="text-xl font-bold text-brand-primary">
               {b.value}
             </div>
-            <div className="mt-0.5 text-xs text-slate-500">{b.label}</div>
+            <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{b.label}</div>
           </div>
         ))}
       </div>
 
       {/* 4. Progress: fixedNow as % of total. Amber→green only when mostly fixed. */}
       <div className="mt-4">
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
             className={`h-full rounded-full transition-all ${
               mostlyFixed
@@ -122,7 +122,7 @@ export function NearbyCitizensCard({
             style={{ width: `${fixedPct}%` }}
           />
         </div>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           {counts.fixedNow} of {total} neighbours say this is fixed
         </p>
       </div>
@@ -148,7 +148,7 @@ export function NearbyCitizensCard({
       </div>
 
       {voted && (
-        <p className="mt-3 text-center text-sm text-slate-500">
+        <p className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
           Thanks — you&apos;ve helped {total} neighbour{total === 1 ? "" : "s"} be
           heard.
         </p>

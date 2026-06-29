@@ -109,8 +109,8 @@ export default function ReportPage() {
 
   return (
     <main className="mx-auto max-w-xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-slate-900">Report an issue</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Report an issue</h1>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
         Snap a photo — we&apos;ll handle the diagnosis, the paperwork, and the
         right department.
       </p>
@@ -119,7 +119,7 @@ export default function ReportPage() {
       {(phase.kind === "idle" || phase.kind === "retry") && (
         <div className="mt-6">
           {phase.kind === "retry" && (
-            <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
+            <div className="mb-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800/60">
               {phase.message}
             </div>
           )}
@@ -129,9 +129,9 @@ export default function ReportPage() {
             <div className="mb-1 flex items-center justify-between">
               <label
                 htmlFor="report-description"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-700 dark:text-slate-200"
               >
-                Add a note <span className="text-slate-400">(optional)</span>
+                Add a note <span className="text-slate-400 dark:text-slate-500">(optional)</span>
               </label>
               <VoiceInputButton onTranscript={appendTranscript} language="en-IN" />
             </div>
@@ -141,16 +141,16 @@ export default function ReportPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Describe the issue, or tap Speak to say it aloud…"
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-800 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
             />
           </div>
 
-          <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white px-6 py-12 text-center transition hover:border-brand-primary">
+          <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white dark:bg-slate-900 px-6 py-12 text-center transition hover:border-brand-primary">
             <span className="text-4xl">📸</span>
-            <span className="mt-2 font-semibold text-slate-700">
+            <span className="mt-2 font-semibold text-slate-700 dark:text-slate-200">
               Tap to add a photo
             </span>
-            <span className="mt-1 text-xs text-slate-400">
+            <span className="mt-1 text-xs text-slate-400 dark:text-slate-500">
               A clear, close shot of the issue works best
             </span>
             <input
@@ -170,7 +170,7 @@ export default function ReportPage() {
       {/* Loading skeleton */}
       {phase.kind === "analysing" && (
         <div className="mt-6">
-          <div className="relative overflow-hidden rounded-2xl bg-slate-100">
+          <div className="relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800">
             {previewUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -191,11 +191,11 @@ export default function ReportPage() {
 
       {/* Outside Bengaluru — friendly, not an error */}
       {phase.kind === "outside" && (
-        <div className="mt-6 rounded-2xl bg-amber-50 p-5 ring-1 ring-amber-200">
-          <p className="font-semibold text-amber-900">
+        <div className="mt-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-5 ring-1 ring-amber-200 dark:ring-amber-800/60">
+          <p className="font-semibold text-amber-900 dark:text-amber-300">
             Looks like you&apos;re outside Bengaluru 🛵
           </p>
-          <p className="mt-1 text-sm text-amber-800">
+          <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
             We&apos;re starting here and expanding soon! Thanks for wanting to
             help your city.
           </p>
@@ -215,25 +215,25 @@ export default function ReportPage() {
 
       {/* CREATE — new issue summary */}
       {phase.kind === "create" && phase.data.issue && (
-        <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold text-emerald-700">
+        <div className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+          <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
             ✅ Your voice is on the map!
           </p>
-          <h2 className="mt-2 text-lg font-bold text-slate-900">
+          <h2 className="mt-2 text-lg font-bold text-slate-900 dark:text-slate-100">
             {phase.data.issue.title}
           </h2>
           {phase.data.impact && (
-            <p className="mt-2 text-[15px] text-slate-700">
+            <p className="mt-2 text-[15px] text-slate-700 dark:text-slate-200">
               {phase.data.impact.tagline}
             </p>
           )}
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
             Routed to {phase.data.issue.authority.name} ·{" "}
             {phase.data.issue.authority.department}
           </p>
           {/* Gamification: badge earned this report (warm, inline) */}
           {phase.data.badges && phase.data.badges.length > 0 && (
-            <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 ring-1 ring-amber-200">
+            <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-sm font-medium text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800/60">
               You&apos;ve earned the {phase.data.badges[0]!.emoji}{" "}
               {phase.data.badges[0]!.label} badge for{" "}
               {phase.data.issue.location.area}!
@@ -286,11 +286,11 @@ function MergeCard({
   }
 
   return (
-    <div className="mt-6 rounded-2xl bg-amber-50 p-5 ring-1 ring-amber-200">
-      <p className="font-semibold text-amber-900">
+    <div className="mt-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-5 ring-1 ring-amber-200 dark:ring-amber-800/60">
+      <p className="font-semibold text-amber-900 dark:text-amber-300">
         🤝 A neighbour spotted this too
       </p>
-      <p className="mt-1 text-sm text-amber-800">
+      <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
         {data.friendlyMessage ??
           "This looks like the same issue someone reported nearby."}
       </p>
@@ -302,13 +302,13 @@ function MergeCard({
       </div>
 
       {status === "confirmed" ? (
-        <div className="mt-4 rounded-xl bg-emerald-100 px-4 py-3 text-sm font-medium text-emerald-800">
+        <div className="mt-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 px-4 py-3 text-sm font-medium text-emerald-800 dark:text-emerald-300">
           <p>Your report has been added — the more voices, the harder to ignore.</p>
           <p className="mt-1">🔍 Truth Checker badge unlocked!</p>
         </div>
       ) : (
         <div className="mt-4">
-          <p className="text-sm font-medium text-amber-900">
+          <p className="text-sm font-medium text-amber-900 dark:text-amber-300">
             Want to add your photo to make this report louder?
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -335,14 +335,14 @@ function MergeCard({
             {data.duplicateId && (
               <Link
                 href={`/issues/${data.duplicateId}`}
-                className="rounded-xl px-4 py-2 text-sm font-semibold text-amber-900 underline"
+                className="rounded-xl px-4 py-2 text-sm font-semibold text-amber-900 dark:text-amber-300 underline"
               >
                 View the existing report →
               </Link>
             )}
           </div>
           {status === "retry" && (
-            <p className="mt-2 text-xs text-amber-700">
+            <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
               Hmm, let&apos;s try that again — a photo of the same spot helps us
               match it.
             </p>
@@ -352,7 +352,7 @@ function MergeCard({
 
       <button
         onClick={onDone}
-        className="mt-4 text-xs text-amber-700 underline"
+        className="mt-4 text-xs text-amber-700 dark:text-amber-300 underline"
       >
         Done
       </button>
@@ -363,13 +363,13 @@ function MergeCard({
 function Thumb({ label, src }: { label: string; src: string | null }) {
   return (
     <div>
-      <div className="aspect-square overflow-hidden rounded-xl bg-slate-200">
+      <div className="aspect-square overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-700">
         {src && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={src} alt={label} className="h-full w-full object-cover" />
         )}
       </div>
-      <p className="mt-1 text-center text-xs font-medium text-amber-900">
+      <p className="mt-1 text-center text-xs font-medium text-amber-900 dark:text-amber-300">
         {label}
       </p>
     </div>

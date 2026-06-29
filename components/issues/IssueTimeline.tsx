@@ -82,8 +82,8 @@ export function IssueTimeline({ issue }: IssueTimelineProps) {
   const events = buildTimeline(issue)
   return (
     <section className="mt-6">
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">Status</h2>
-      <ol className="relative space-y-5 border-l-2 border-slate-200 pl-5">
+      <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-slate-100">Status</h2>
+      <ol className="relative space-y-5 border-l-2 border-slate-200 dark:border-slate-700 pl-5">
         {events.map((e) => (
           <li key={e.label} className="relative">
             {/* Dot */}
@@ -98,17 +98,17 @@ export function IssueTimeline({ issue }: IssueTimelineProps) {
             </span>
             <div className="flex flex-wrap items-baseline gap-x-2">
               <span
-                className={`font-medium ${e.done ? "text-slate-900" : "text-slate-400"}`}
+                className={`font-medium ${e.done ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"}`}
               >
                 {e.label}
               </span>
               {e.date && (
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-400 dark:text-slate-500">
                   {shortDate(e.date)}
                 </span>
               )}
             </div>
-            <p className={`text-sm ${e.done ? "text-slate-600" : "text-slate-400"}`}>
+            <p className={`text-sm ${e.done ? "text-slate-600 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}`}>
               {e.detail}
             </p>
           </li>

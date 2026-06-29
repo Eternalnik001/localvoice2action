@@ -132,7 +132,7 @@ export function VoiceInputButton({
           ? "bg-red-500 text-white"
           : state === "done"
             ? "bg-emerald-500 text-white"
-            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700"
       }`}
     >
       {state === "idle" && (

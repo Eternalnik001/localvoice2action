@@ -44,8 +44,8 @@ export function DashboardCharts({ byCategory, byArea }: DashboardChartsProps) {
   return (
     <>
       {/* Section 2 — issues by category (horizontal bars) */}
-      <section className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+      <section className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
           What Bengaluru is reporting
         </h2>
         <ResponsiveContainer width="100%" height={Math.max(220, byCategory.length * 44)}>
@@ -73,8 +73,8 @@ export function DashboardCharts({ byCategory, byArea }: DashboardChartsProps) {
       </section>
 
       {/* Section 3 — resolution rate by area (grouped bars) */}
-      <section className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+      <section className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
           Which areas are getting fixed
         </h2>
         <ResponsiveContainer width="100%" height={300}>

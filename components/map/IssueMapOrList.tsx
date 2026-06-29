@@ -102,9 +102,9 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
         <div className="space-y-6">
           {groups.map((group) => (
             <section key={group.area}>
-              <h2 className="mb-2 flex items-baseline gap-2 text-lg font-semibold text-slate-900">
+              <h2 className="mb-2 flex items-baseline gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
                 {group.area}
-                <span className="text-sm font-normal text-slate-400">
+                <span className="text-sm font-normal text-slate-400 dark:text-slate-500">
                   {group.count} {group.count === 1 ? "issue" : "issues"}
                 </span>
               </h2>
@@ -113,18 +113,18 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
                   <Link
                     key={issue.id}
                     href={`/issues/${issue.id}`}
-                    className="block rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:ring-brand-primary"
+                    className="block rounded-xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 transition hover:ring-brand-primary"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <SeverityBadge severity={issue.severity} />
                       {issue.status === "RESOLVED" && (
-                        <span className="text-xs font-semibold text-emerald-600">
+                        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                           ✓ Resolved
                         </span>
                       )}
                     </div>
-                    <p className="mt-2 font-medium text-slate-900">{issue.title}</p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-2 font-medium text-slate-900 dark:text-slate-100">{issue.title}</p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                       {issue.confirmations?.still_there ?? issue.upvotes} neighbours
                       flagged this
                     </p>
@@ -143,12 +143,12 @@ export function IssueMapOrList({ issues }: IssueMapOrListProps) {
     <div>
       <div
         ref={mapRef}
-        className="h-[60vh] w-full overflow-hidden rounded-2xl bg-slate-100"
+        className="h-[60vh] w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800"
         aria-label="Interactive map of civic issues across Bengaluru"
       />
       <button
         onClick={() => setMode("list")}
-        className="mt-2 text-sm text-slate-500 underline"
+        className="mt-2 text-sm text-slate-500 dark:text-slate-400 underline"
       >
         Prefer a list?
       </button>

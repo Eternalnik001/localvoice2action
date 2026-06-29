@@ -97,31 +97,31 @@ export default async function IssueDetailPage({
         ← Back to map
       </Link>
 
-      <div className="mt-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div className="mt-3 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
         <div className="flex flex-wrap items-center gap-2">
           <SeverityBadge severity={issue.severity} />
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
               issue.status === "RESOLVED"
-                ? "bg-emerald-100 text-emerald-700"
+                ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300"
                 : issue.status === "IN_PROGRESS"
-                  ? "bg-amber-100 text-amber-800"
-                  : "bg-red-100 text-red-700"
+                  ? "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300"
+                  : "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300"
             }`}
           >
             {issue.status.replace("_", " ")}
           </span>
         </div>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">{issue.title}</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">{issue.title}</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           {issue.location.area}
           {issue.location.ward ? ` · ${issue.location.ward}` : ""}
         </p>
-        <p className="mt-3 text-slate-700">{issue.description}</p>
+        <p className="mt-3 text-slate-700 dark:text-slate-200">{issue.description}</p>
 
         {/* Reporter line + earned badges */}
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
-          <span className="text-sm text-slate-500">
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             Reported by {issue.reporter_display_name ?? "a citizen"}
           </span>
           <BadgePills badges={reporterBadges} />
@@ -131,7 +131,7 @@ export default async function IssueDetailPage({
       {/* For RESOLVED issues, the fix is the hero — slider first, above the fold. */}
       {isResolved && issue.photos.resolution && (
         <section className="mt-6">
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">
+          <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
             See the fix
           </h2>
           <ErrorBoundary>
@@ -146,7 +146,7 @@ export default async function IssueDetailPage({
             />
           </ErrorBoundary>
           {issue.resolution_reasoning && (
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
               {issue.resolution_reasoning}
             </p>
           )}

@@ -46,8 +46,8 @@ export class ErrorBoundary extends Component<
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback
       return (
-        <div className="rounded-2xl bg-white p-5 text-center shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-medium text-slate-700">
+        <div className="rounded-2xl bg-white dark:bg-slate-900 p-5 text-center shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
             This section couldn&apos;t load — the rest of the app is fine.
           </p>
           <button

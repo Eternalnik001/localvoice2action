@@ -54,7 +54,7 @@ export function NicknamePrompt() {
 
   if (state === "saved") {
     return (
-      <p className="mt-3 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200">
+      <p className="mt-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-sm font-medium text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-800/60">
         Saved! Welcome, {nickname.trim() || "Neighbour"} 👋 You can now track
         your badges.
       </p>
@@ -62,8 +62,8 @@ export function NicknamePrompt() {
   }
 
   return (
-    <div className="mt-3 rounded-xl bg-slate-50 px-3 py-3 ring-1 ring-slate-200">
-      <p className="text-sm font-medium text-slate-700">
+    <div className="mt-3 rounded-xl bg-slate-50 dark:bg-slate-900 px-3 py-3 ring-1 ring-slate-200 dark:ring-slate-700">
+      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
         Want to track this issue? Pick a nickname — no email needed.
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -72,7 +72,7 @@ export function NicknamePrompt() {
           onChange={(e) => setNickname(e.target.value)}
           placeholder="e.g. Asha from Koramangala"
           maxLength={40}
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+          className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
         />
         <button
           type="button"
@@ -85,7 +85,7 @@ export function NicknamePrompt() {
         <button
           type="button"
           onClick={() => setState("skipped")}
-          className="text-sm text-slate-400 underline"
+          className="text-sm text-slate-400 dark:text-slate-500 underline"
         >
           Skip
         </button>

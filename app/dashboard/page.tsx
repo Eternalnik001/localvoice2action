@@ -22,11 +22,11 @@ import { timeAgo } from "@/lib/format"
 import type { Issue } from "@/lib/types"
 
 const STATUS_LABEL: Record<Issue["status"], { text: string; className: string }> = {
-  OPEN: { text: "Open", className: "bg-red-100 text-red-700" },
-  ACKNOWLEDGED: { text: "Acknowledged", className: "bg-violet-100 text-violet-700" },
-  IN_PROGRESS: { text: "In progress", className: "bg-amber-100 text-amber-800" },
-  RESOLVED: { text: "Resolved", className: "bg-emerald-100 text-emerald-700" },
-  CLOSED: { text: "Closed", className: "bg-slate-100 text-slate-600" },
+  OPEN: { text: "Open", className: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300" },
+  ACKNOWLEDGED: { text: "Acknowledged", className: "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300" },
+  IN_PROGRESS: { text: "In progress", className: "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300" },
+  RESOLVED: { text: "Resolved", className: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300" },
+  CLOSED: { text: "Closed", className: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" },
 }
 
 const TYPE_LABEL: Record<Issue["issue_type"], string> = {
@@ -50,12 +50,12 @@ function StatCard({
   sub?: string
 }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+    <div className="rounded-2xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
         {label}
       </p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-slate-500">{sub}</p>}
+      <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
+      {sub && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{sub}</p>}
     </div>
   )
 }
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold text-brand-primary">
             Impact Dashboard
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Public accountability for Bengaluru&apos;s civic issues
           </p>
         </div>
@@ -127,8 +127,8 @@ export default async function DashboardPage() {
       </ErrorBoundary>
 
       {/* Section 4 — recent activity feed */}
-      <section className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-3 text-lg font-semibold text-slate-900">
+      <section className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-slate-100">
           Recent activity
         </h2>
         <ul className="divide-y divide-slate-100">
@@ -140,10 +140,10 @@ export default async function DashboardPage() {
                   href={`/issues/${issue.id}`}
                   className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 transition hover:opacity-80"
                 >
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
                     {issue.location.area}
                   </span>
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
                     {TYPE_LABEL[issue.issue_type]}
                   </span>
                   <span
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
                     {status.text}
                   </span>
                   <SeverityBadge severity={issue.severity} />
-                  <span className="ml-auto text-xs text-slate-400">
+                  <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">
                     {timeAgo(issue.created_at, new Date(now))}
                   </span>
                 </Link>
@@ -163,29 +163,29 @@ export default async function DashboardPage() {
       </section>
 
       {/* Section 5 — neighbourhood leaderboard */}
-      <section className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-3 text-lg font-semibold text-slate-900">
+      <section className="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-slate-100">
           Most active neighbourhoods this month
         </h2>
         <ol className="space-y-3">
           {leaderboard.map((row, idx) => (
             <li key={row.area} className="flex items-center gap-3">
-              <span className="w-6 text-center text-lg font-bold text-slate-400">
+              <span className="w-6 text-center text-lg font-bold text-slate-400 dark:text-slate-500">
                 {idx + 1}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
                     {row.nickname ?? "Anonymous Neighbour"}
                   </span>
-                  <span className="text-xs text-slate-500">{row.area}</span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">{row.area}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">
                     · {row.reports} reports
                   </span>
                   {row.topBadge && (
                     <span
                       title={row.topBadge.description}
-                      className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 ring-1 ring-amber-200"
+                      className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800/60"
                     >
                       <span aria-hidden>{row.topBadge.emoji}</span>
                       {row.topBadge.label}
@@ -194,13 +194,13 @@ export default async function DashboardPage() {
                 </div>
                 {/* Resolution-rate mini progress bar */}
                 <div className="mt-1 flex items-center gap-2">
-                  <div className="h-1.5 w-full max-w-[180px] overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-1.5 w-full max-w-[180px] overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                     <div
                       className="h-full rounded-full bg-emerald-500"
                       style={{ width: `${row.resolutionRate}%` }}
                     />
                   </div>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     {row.resolutionRate}% resolved
                   </span>
                 </div>

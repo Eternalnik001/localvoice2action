@@ -18,7 +18,7 @@ export function BadgePills({ badges, className = "" }: BadgePillsProps) {
         <span
           key={b.id}
           title={b.description}
-          className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 ring-1 ring-amber-200"
+          className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800/60"
         >
           <span aria-hidden>{b.emoji}</span>
           {b.label}

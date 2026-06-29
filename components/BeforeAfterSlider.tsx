@@ -30,19 +30,19 @@ const VERDICT: Record<
 > = {
   resolved: {
     label: "✓ Verified fixed",
-    className: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300",
+    className: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-300 dark:ring-emerald-800",
   },
   partial: {
     label: "~ Partially fixed",
-    className: "bg-amber-100 text-amber-800 ring-1 ring-amber-300",
+    className: "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 ring-1 ring-amber-300 dark:ring-amber-800",
   },
   not_resolved: {
     label: "✗ Not yet fixed",
-    className: "bg-red-100 text-red-700 ring-1 ring-red-300",
+    className: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 ring-1 ring-red-300 dark:ring-red-800",
   },
   cant_tell: {
     label: "? Awaiting verification",
-    className: "bg-slate-100 text-slate-600 ring-1 ring-slate-300",
+    className: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 ring-1 ring-slate-300 dark:ring-slate-700",
   },
 }
 

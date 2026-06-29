@@ -47,7 +47,7 @@ export function MyBadges() {
   // No saved nickname (or the session link expired) → subtle invite, never a block.
   if (!hasToken || expired) {
     return (
-      <p className="mt-3 text-sm text-slate-500">
+      <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
         🏅 You&apos;ve earned badges — save a nickname to see them.
       </p>
     )
@@ -55,7 +55,7 @@ export function MyBadges() {
 
   if (badges.length === 0) {
     return (
-      <p className="mt-3 text-sm text-slate-400">
+      <p className="mt-3 text-sm text-slate-400 dark:text-slate-500">
         {nickname ? `Hi ${nickname} — ` : ""}report or confirm issues to earn
         badges.
       </p>
@@ -64,14 +64,14 @@ export function MyBadges() {
 
   return (
     <div className="mt-3">
-      <p className="text-sm font-medium text-slate-700">
+      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
         {nickname ? `${nickname}'s badges` : "Your badges"}
       </p>
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
         {badges.map((b) => (
           <span
             key={b.id}
-            className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 ring-1 ring-amber-200"
+            className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800/60"
           >
             <span aria-hidden>{b.emoji}</span>
             {b.label}

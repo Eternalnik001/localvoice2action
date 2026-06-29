@@ -24,34 +24,34 @@ const TYPE_STYLE: Record<
   { card: string; badge: string; label: string }
 > = {
   hotspot: {
-    card: "bg-red-50 ring-red-200",
-    badge: "bg-red-100 text-red-700",
+    card: "bg-red-50 dark:bg-red-900/20 ring-red-200 dark:ring-red-800/60",
+    badge: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
     label: "Hotspot",
   },
   prediction: {
-    card: "bg-amber-50 ring-amber-200",
-    badge: "bg-amber-100 text-amber-800",
+    card: "bg-amber-50 dark:bg-amber-900/20 ring-amber-200 dark:ring-amber-800/60",
+    badge: "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300",
     label: "Prediction",
   },
   trend: {
-    card: "bg-blue-50 ring-blue-200",
-    badge: "bg-blue-100 text-blue-700",
+    card: "bg-blue-50 dark:bg-blue-900/20 ring-blue-200 dark:ring-blue-800/60",
+    badge: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300",
     label: "Trend",
   },
   recognition: {
-    card: "bg-emerald-50 ring-emerald-200",
-    badge: "bg-emerald-100 text-emerald-700",
+    card: "bg-emerald-50 dark:bg-emerald-900/20 ring-emerald-200 dark:ring-emerald-800/60",
+    badge: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300",
     label: "Recognition",
   },
 }
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-2xl bg-slate-100 p-4 ring-1 ring-slate-200">
-      <div className="h-6 w-6 rounded-full bg-slate-200" />
-      <div className="mt-3 h-4 w-3/4 rounded bg-slate-200" />
-      <div className="mt-2 h-3 w-full rounded bg-slate-200" />
-      <div className="mt-1.5 h-3 w-5/6 rounded bg-slate-200" />
+    <div className="animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800 p-4 ring-1 ring-slate-200 dark:ring-slate-700">
+      <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700" />
+      <div className="mt-3 h-4 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
+      <div className="mt-2 h-3 w-full rounded bg-slate-200 dark:bg-slate-700" />
+      <div className="mt-1.5 h-3 w-5/6 rounded bg-slate-200 dark:bg-slate-700" />
     </div>
   )
 }
@@ -70,10 +70,10 @@ function Card({ insight }: { insight: InsightCard }) {
           {style.label}
         </span>
       </div>
-      <p className="mt-2 font-medium text-slate-900">{insight.title}</p>
-      <p className="mt-1 text-sm text-slate-600">{insight.body}</p>
+      <p className="mt-2 font-medium text-slate-900 dark:text-slate-100">{insight.title}</p>
+      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{insight.body}</p>
       {insight.area && (
-        <p className="mt-2 text-xs font-medium text-slate-400">
+        <p className="mt-2 text-xs font-medium text-slate-400 dark:text-slate-500">
           📍 {insight.area}
         </p>
       )}
@@ -113,10 +113,10 @@ export function InsightCards() {
 
   return (
     <section className="mt-6">
-      <h2 className="text-lg font-semibold text-slate-900">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
         AI insights for Bengaluru
       </h2>
-      <p className="text-sm text-slate-500">Updated hourly · Powered by Gemini</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">Updated hourly · Powered by Gemini</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {loading || insights === null ? (
           <>

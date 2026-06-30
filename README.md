@@ -60,6 +60,79 @@ A report doesn't end at submission — it ends at a vision-verified fix that eve
 
 ---
 
+## Architecture
+
+A seven-layer view of the system — from citizen intake, through the Gemini-powered agent layer, to the public map and dashboard, with a pluggable persistence layer in between.
+
+```mermaid
+flowchart TD
+    subgraph L1["Layer 1 · Citizen Intake"]
+        direction LR
+        GPS["Device GPS"]
+        Voice["Voice (en-IN)"]
+        Photo["Photo / Camera"]
+    end
+
+    subgraph L2["Layer 2 · Next.js 14 Gateway"]
+        Shell["App Router Shell"]
+        API["API Route Handlers"]
+        Pages["Pages: /report · /dashboard · /profile"]
+    end
+
+    subgraph L3["Layer 3 · Agent Orchestration"]
+        direction LR
+        A1["Vision Analyst"]
+        A2["De-duplication"]
+        A3["Routing Agent"]
+        A4["Community Validator"]
+        A5["Resolution Verifier"]
+        A6["Impact Estimator"]
+        A7["Insight Agent"]
+    end
+
+    subgraph L4["Layer 4 · Foundation Model"]
+        Gemini["Gemini 3.5 Flash"]
+    end
+
+    subgraph L5["Layer 5 · Persistence"]
+        direction LR
+        Store["getStore() Factory"]
+        Mem["In-Memory (Seed)"]
+        FS["Cloud Firestore"]
+    end
+
+    subgraph L6["Layer 6 · Outputs"]
+        direction LR
+        Map["Live Map (Maps JS API)"]
+        Dash["Accountability Dashboard"]
+    end
+
+    subgraph L7["Layer 7 · Governance + Privacy"]
+        direction LR
+        Priv["Privacy: salted IP-hash"]
+        Rate["Vote throttling: 24h / device"]
+        Audit["Audit + monitoring (planned)"]
+    end
+
+    GPS --> Shell
+    Voice --> Shell
+    Photo --> Shell
+    Shell --> API
+    Shell --> Pages
+    API --> A1 & A2 & A3 & A4 & A5 & A6 & A7
+    A1 & A2 & A3 & A4 & A5 & A6 & A7 --> Gemini
+    API --> Store
+    Store --> Mem
+    Store --> FS
+    Mem & FS --> Map & Dash
+    Priv -.-> API
+    Rate -.-> API
+```
+
+> **Layer 7 (Governance + Privacy)** reflects the production-hardening path. The **privacy** layer (a salted IP-hash — a raw IP is never stored) and **per-device vote throttling** (one vote per issue per 24h) are live today; **audit + monitoring** is on the roadmap. The platform is intentionally **auth-free** — no login is needed to report or verify.
+
+---
+
 ## How It Works
 
 Every stage of the loop is handled by a dedicated, server-side AI agent. Agents are **pure functions** — no database access inside them; persistence happens only in the API layer.

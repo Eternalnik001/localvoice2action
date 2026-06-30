@@ -44,14 +44,18 @@ A report doesn't end at submission — it ends at a vision-verified fix that eve
 
 | | Feature | What it does |
 |---|---|---|
-| 📸 | **AI photo triage** | Multimodal vision classifies the issue type, severity, and a description from a single photo. |
+| 📸 | **AI photo triage** | Multimodal vision classifies the issue type, severity, and a description from a single photo — and you can override the category if it's off. |
+| 📍 | **Auto-location** | Captures your device GPS (with a safe fallback) and reverse-geocodes it to the real Bengaluru neighbourhood + ward. |
 | 🔍 | **Smart de-duplication** | Geo-matching + Gemini function-calling detect a likely existing report nearby and invite a *confirming* photo — never a cold "rejected, duplicate." |
-| 🏛️ | **Auto-routing** | Determines the correct authority and drafts a ready-to-send complaint with the right helpline and priority. |
+| 🏛️ | **Auto-routing & escalation** | Routes to the correct authority with a drafted complaint; sustained "Still There" votes auto-escalate priority, with a live "escalates in N days" countdown. |
 | 🎚️ | **Before / After slider** | A draggable wipe-comparison on resolved issues — the fix is *seen*, not just claimed. |
 | 🤝 | **"You're not alone" card** | Estimates how many neighbours, commuters, and businesses an issue affects — turning a lone complaint into a shared cause. |
-| ✅ | **Community verification** | Frictionless, anonymous *Still There / Fixed Now* voting keeps issue status honest. |
-| 🏅 | **Gamification** | Anonymous neighbourhood badges and a leaderboard reward civic participation. |
+| ✅ | **Community verification** | Frictionless, anonymous *Still There / Fixed Now* voting keeps status honest and auto-marks community-fixed issues. |
+| 🗺️ | **Live map — pins & heatmap** | Clear, status-coloured tappable pins with a one-tap toggle to a community-weighted heatmap. |
+| 🏅 | **Profile, tiers & expertise** | A personal **/profile**: a community rank (Newcomer → District Guardian) + per-issue-type expertise levels with progress bars, plus a neighbourhood leaderboard. |
 | 🎙️ | **Voice input** | Describe an issue by speaking (Web Speech API, India-English). |
+| 🌙 | **Dark mode** | System-aware light/dark toggle (purple-accented) — including dark Google Map tiles. |
+| 📱 | **Mobile-ready** | Notch/safe-area handling, no iOS input-zoom, in-app camera capture, and comfortable touch targets. |
 | 📊 | **Accountability dashboard** | Live charts on resolution rates by area and category, plus AI-generated insights for the city. |
 
 ---
